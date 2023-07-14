@@ -10,14 +10,14 @@ namespace toy2d {
   void Context::Init() { instance_.reset(new Context); }
   void Context::Quit() { instance_.reset(); }
 
-  void Context::ShowLayers() {
+  void Context::showLayers() {
     std::cout << "LAYERS: " << std::endl;
     auto layers = vk::enumerateInstanceLayerProperties();
     for (auto& layer : layers) {
       std::cout << layer.layerName << std::endl;
     }
   }
-  void Context::ShowExtensions() {
+  void Context::showExtensions() {
     std::cout << "EXTENSIONS: " << std::endl;
     auto extensions = vk::enumerateInstanceExtensionProperties();
     for (auto& extension : extensions) {
