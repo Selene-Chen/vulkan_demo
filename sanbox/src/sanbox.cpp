@@ -1,5 +1,6 @@
-
 #include <SDL.h>
+
+#include <toy2d/toy2d.hpp>
 
 constexpr int WindowWidth = 1024;
 constexpr int WindowHeight = 720;
@@ -19,6 +20,8 @@ int main(int argc, char *argv[]) {
   bool should_closed = false;
   SDL_Event event;
 
+  toy2d::Init();
+
   while (!should_closed) {
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_QUIT) {
@@ -27,6 +30,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  toy2d::Quit();
   SDL_DestroyWindow(window);
   SDL_Quit();
 

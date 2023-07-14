@@ -10,5 +10,5 @@ project(vulkan_demo LANGUAGES CXX)
 include(cmake/findsdl2.cmake)
 find_package(Vulkan REQUIRED)
 
-# add_subdirectory(toy2d)
+add_subdirectory(toy2d)
 add_subdirectory(sanbox)
