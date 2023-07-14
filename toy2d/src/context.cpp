@@ -1,7 +1,5 @@
 #include "toy2d/context.hpp"
 
-#include <vulkan/vulkan_core.h>
-
 #include <iostream>
 #include <vector>
 
@@ -13,20 +11,36 @@ namespace toy2d {
   void Context::Quit() { instance_.reset(); }
 
   void Context::ShowLayers() {
-    std::cout << "LAYERS:" << std::endl;
+    std::cout << "LAYERS: " << std::endl;
     auto layers = vk::enumerateInstanceLayerProperties();
     for (auto& layer : layers) {
       std::cout << layer.layerName << std::endl;
     }
   }
-
+  void Context::ShowExtensions() {
+    std::cout << "EXTENSIONS: " << std::endl;
+    auto extensions = vk::enumerateInstanceExtensionProperties();
+    for (auto& extension : extensions) {
+      std::cout << extension.extensionName << std::endl;
+    }
+  }
   Context::Context() {
+    // fixed error:VK_ERROR_INCOMPATIBLE_DRIVER for mac
+    std::vector<const char*> extensions = {"VK_KHR_portability_enumeration"};
+    vk::InstanceCreateFlagBits flags =
+      vk::InstanceCreateFlagBits::eEnumeratePortabilityKHR;
+
+    // layer
     std::vector<const char*> layers = {"VK_LAYER_KHRONOS_validation"};
 
     vk::InstanceCreateInfo createInfo;
     vk::ApplicationInfo appInfo;
-    appInfo.setApiVersion(VK_API_VERSION_1_2);
-    createInfo.setPApplicationInfo(&appInfo).setPEnabledLayerNames(layers);
+    appInfo.setApiVersion(VK_API_VERSION_1_3);
+    createInfo.setPApplicationInfo(&appInfo)
+      .setPEnabledLayerNames(layers)
+      .setPEnabledExtensionNames(extensions)
+      .setEnabledExtensionCount(extensions.size())
+      .setFlags(flags);
 
     Instance = vk::createInstance(createInfo);
   }

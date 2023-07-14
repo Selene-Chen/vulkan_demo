@@ -15,6 +15,7 @@ namespace toy2d {
    private:
     Context();
     void ShowLayers();
+    void ShowExtensions();
     static std::unique_ptr<Context> instance_;
   };
 }  // namespace toy2d
