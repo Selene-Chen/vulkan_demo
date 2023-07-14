@@ -24,7 +24,7 @@ namespace toy2d {
       std::cout << extension.extensionName << std::endl;
     }
   }
-  Context::Context() {
+  void Context::createInstance() {
     // fixed error:VK_ERROR_INCOMPATIBLE_DRIVER for mac
     std::vector<const char*> extensions = {"VK_KHR_portability_enumeration"};
     vk::InstanceCreateFlagBits flags =
@@ -44,6 +44,7 @@ namespace toy2d {
 
     Instance = vk::createInstance(createInfo);
   }
+  Context::Context() { createInstance(); }
   Context::~Context() { Instance.destroy(); }
 
 }  // namespace toy2d
