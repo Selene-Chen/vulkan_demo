@@ -24,6 +24,14 @@ namespace toy2d {
       std::cout << extension.extensionName << std::endl;
     }
   }
+  void Context::showPhysicalDevices(vk::Instance instance) {
+    std::cout << "DEVICES:" << std::endl;
+    auto devices = instance.enumeratePhysicalDevices();
+    for (auto& device : devices) {
+      auto properties = device.getProperties();
+      std::cout << properties.deviceName << std::endl;
+    }
+  }
   void Context::createInstance() {
     // fixed error:VK_ERROR_INCOMPATIBLE_DRIVER for mac
     std::vector<const char*> extensions = {"VK_KHR_portability_enumeration"};
@@ -44,7 +52,16 @@ namespace toy2d {
 
     Instance = vk::createInstance(createInfo);
   }
-  Context::Context() { createInstance(); }
+  void Context::pickupPhysicalDevice() {
+    PhysicalDevice = Instance.enumeratePhysicalDevices()[0];
+    auto properties = PhysicalDevice.getProperties();
+    std::cout << "pickup physical device is " << properties.deviceName
+              << std::endl;
+  }
+  Context::Context() {
+    createInstance();
+    pickupPhysicalDevice();
+  }
   Context::~Context() { Instance.destroy(); }
 
 }  // namespace toy2d
