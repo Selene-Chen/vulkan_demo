@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <vulkan/vulkan_enums.hpp>
 
 namespace toy2d {
   std::unique_ptr<Context> Context::instance_ = nullptr;
@@ -32,6 +33,7 @@ namespace toy2d {
       std::cout << properties.deviceName << std::endl;
     }
   }
+
   void Context::createInstance() {
     // fixed error:VK_ERROR_INCOMPATIBLE_DRIVER for mac
     std::vector<const char*> extensions = {"VK_KHR_portability_enumeration"};
@@ -52,16 +54,57 @@ namespace toy2d {
 
     Instance = vk::createInstance(createInfo);
   }
+
   void Context::pickupPhysicalDevice() {
     PhysicalDevice = Instance.enumeratePhysicalDevices()[0];
     auto properties = PhysicalDevice.getProperties();
     std::cout << "pickup physical device is " << properties.deviceName
               << std::endl;
   }
+
+  void Context::queryQueueFamliyIndices() {
+    auto properties = PhysicalDevice.getQueueFamilyProperties();
+    for (int i; i < properties.size(); i++) {
+      if (properties[i].queueFlags | vk::QueueFlagBits::eGraphics) {
+        QueueFamliyIndices.GraphicsQueue = i;
+        break;
+      }
+    }
+  }
+
+  void Context::createDevice() {
+    // 1.3.216 必需开启 VK_KHR_portability_subset
+    std::vector<const char*> extensions = {"VK_KHR_portability_subset"};
+
+    vk::DeviceCreateInfo deviceCreateInfo;
+    vk::DeviceQueueCreateInfo queueCreateInfo;
+
+    float priorities = 1.0;
+    queueCreateInfo.setPQueuePriorities(&priorities)
+      .setQueueCount(1)
+      .setQueueFamilyIndex(QueueFamliyIndices.GraphicsQueue.value());
+
+    deviceCreateInfo.setQueueCreateInfos(queueCreateInfo)
+      .setPEnabledExtensionNames(extensions)
+      .setEnabledExtensionCount(extensions.size());
+
+    Device = PhysicalDevice.createDevice(deviceCreateInfo);
+  }
+
+  void Context::getGraphicsQueue() {
+    GraphicsQueue =
+      Device.getQueue(QueueFamliyIndices.GraphicsQueue.value(), 0);
+  }
   Context::Context() {
     createInstance();
     pickupPhysicalDevice();
+    queryQueueFamliyIndices();
+    createDevice();
+    getGraphicsQueue();
   }
-  Context::~Context() { Instance.destroy(); }
+  Context::~Context() {
+    Device.destroy();
+    Instance.destroy();
+  }
 
 }  // namespace toy2d
